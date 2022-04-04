@@ -430,8 +430,8 @@ def get_holdings():
 # https://plaid.com/docs/#investments
 
 
-@app.route('/api/investments_transactions', methods=['GET'])
-def get_investments_transactions():
+@app.route('/api/investment_transactions', methods=['GET'])
+def get_investment_transactions():
     # Pull transactions for the last 30 days
 
     start_date = (datetime.datetime.now() - timedelta(days=(30)))
@@ -444,7 +444,7 @@ def get_investments_transactions():
             end_date=end_date.date(),
             options=options
         )
-        response = client.investments_transactions_get(
+        response = client.investment_transactions_get(
             request)
         pretty_print_response(response.to_dict())
         return jsonify(
@@ -583,4 +583,4 @@ def authorize_and_create_transfer(access_token):
 
 
 if __name__ == '__main__':
-    app.run(port=os.getenv('PORT', 8000))
+    app.run(port=os.getenv('PORT', 8003))
