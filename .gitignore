@@ -52,3 +52,10 @@ docker-compose.local*.yml
 
 #vscode
 .vscode
+
+# Rama JoseAM
+front_hector*
+plaid-python*
+python/python
+scripts*
+node/.env
