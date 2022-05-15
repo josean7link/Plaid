@@ -14,9 +14,9 @@
   "dependencies": {
     "body-parser": "1.18.x",
     "dotenv": "^8.2.0",
-    "ejs": "2.5.x",
+    "ejs": "^3.1.7",
     "express": "4.16.x",
-    "moment": "2.22.x",
+    "moment": "^2.29.3",
     "nodemon": "^2.0.5",
     "plaid": "^9.9.0"
   }

@@ -61,6 +61,7 @@ app = Flask(__name__)
 # Fill in your Plaid API keys - https://dashboard.plaid.com/account/keys
 PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
 PLAID_SECRET = os.getenv('PLAID_SECRET')
+
 # Use 'sandbox' to test with Plaid's Sandbox environment (username: user_good,
 # password: pass_good)
 # Use `development` to test with live users and credentials and `production`
@@ -82,6 +83,7 @@ def empty_to_none(field):
         return None
     return value
 
+
 host = plaid.Environment.Sandbox
 
 if PLAID_ENV == 'sandbox':
@@ -93,6 +95,7 @@ if PLAID_ENV == 'development':
 if PLAID_ENV == 'production':
     host = plaid.Environment.Production
 
+
 # Parameters used for the OAuth redirect Link flow.
 #
 # Set PLAID_REDIRECT_URI to 'http://localhost:3000/'
@@ -101,6 +104,7 @@ if PLAID_ENV == 'production':
 # this redirect URI for your client ID through the Plaid developer dashboard
 # at https://dashboard.plaid.com/team/api.
 PLAID_REDIRECT_URI = empty_to_none('PLAID_REDIRECT_URI')
+
 
 configuration = plaid.Configuration(
     host=host,
@@ -118,10 +122,9 @@ products = []
 for product in PLAID_PRODUCTS:
     products.append(Products(product))
 
-
 # We store the access_token in memory - in production, store it in a secure
 # persistent data store.
-access_token = None
+access_token = None # 'link-sandbox-2a3930fd-5ac5-4fbb-b533-afd93a0ccc25'
 # The payment_id is only relevant for the UK Payment Initiation product.
 # We store the payment_id in memory - in production, store it in a secure
 # persistent data store.
@@ -132,6 +135,23 @@ payment_id = None
 transfer_id = None
 
 item_id = None
+
+print(f"Leyendo Server.py")
+print(f"PLAID_CLIENT_ID: {PLAID_CLIENT_ID}")
+print(f"PLAID_SECRET: {PLAID_SECRET}")
+print(f"host: {host}")
+print(f"PLAID_REDIRECT_URI: {PLAID_REDIRECT_URI}")
+print(f"configuration:")
+for key, value in configuration.__dict__.items():
+    print(key, '==', value)
+# print(f"api_client:")
+# for key, value in api_client.__dict__.items():
+#     print(key, '==', value)
+# print(f"client:")
+# for key, value in client.__dict__.items():
+#     print(key, '==', value)
+print(f"products: {products}")
+print(f"access_token: {access_token}")
 
 
 @app.route('/api/info', methods=['POST'])
@@ -246,14 +266,15 @@ def get_access_token():
 @app.route('/api/auth', methods=['GET'])
 def get_auth():
     try:
-       request = AuthGetRequest(
+        request = AuthGetRequest(
             access_token=access_token
         )
-       response = client.auth_get(request)
-       pretty_print_response(response.to_dict())
-       return jsonify(response.to_dict())
+        response = client.auth_get(request)
+        pretty_print_response(response.to_dict())
+        return jsonify(response.to_dict())
     except plaid.ApiException as e:
-        error_response = format_error(e)
+        # error_response = format_error(e)
+        error_response = "error en api auth"
         return jsonify(error_response)
 
 
@@ -457,6 +478,7 @@ def get_investment_transactions():
 # This functionality is only relevant for the ACH Transfer product.
 # Retrieve Transfer for a specified Transfer ID
 
+
 @app.route('/api/transfer', methods=['GET'])
 def transfer():
     global transfer_id
@@ -509,8 +531,10 @@ def item():
         error_response = format_error(e)
         return jsonify(error_response)
 
+
 def pretty_print_response(response):
-  print(json.dumps(response, indent=2, sort_keys=True, default=str))
+    print(json.dumps(response, indent=2, sort_keys=True, default=str))
+
 
 def format_error(e):
     response = json.loads(e.body)
@@ -520,6 +544,8 @@ def format_error(e):
 # This is a helper function to authorize and create a Transfer after successful
 # exchange of a public_token for an access_token. The transfer_id is then used
 # to obtain the data about that particular Transfer.
+
+
 def authorize_and_create_transfer(access_token):
     try:
         # We call /accounts/get to obtain first account_id - in production,
@@ -583,4 +609,4 @@ def authorize_and_create_transfer(access_token):
 
 
 if __name__ == '__main__':
-    app.run(port=os.getenv('PORT', 8003))
+    app.run(port=os.getenv('PORT', 8000))
