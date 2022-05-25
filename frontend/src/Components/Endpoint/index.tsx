@@ -1,12 +1,12 @@
-import React, { useState } from "react";
 import Button from "plaid-threads/Button";
 import Note from "plaid-threads/Note";
-
-import Table from "../Table";
+import React, { useState } from "react";
+import { Categories, Data, DataItem, ErrorDataItem } from "../../dataUtilities";
 import Error from "../Error";
-import { DataItem, Categories, ErrorDataItem, Data } from "../../dataUtilities";
-
+import Table from "../Table";
 import styles from "./index.module.scss";
+
+
 
 interface Props {
   endpoint: string;
@@ -26,7 +26,12 @@ const Endpoint = (props: Props) => {
 
   const getData = async () => {
     setIsLoading(true);
-    const response = await fetch(`/api/${props.endpoint}`, { method: "GET" });
+    const response = await fetch(`http:localhost:8000/api/v1/plaid/${props.endpoint}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+      },
+    });
     const data = await response.json();
     if (data.error != null) {
       setError(data.error);

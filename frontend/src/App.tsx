@@ -1,17 +1,22 @@
-import React, { useEffect, useContext, useCallback } from "react";
-
+import React, { useCallback, useContext, useEffect } from "react";
+import styles from "./App.module.scss";
 import Header from "./Components/Headers";
-import Products from "./Components/ProductTypes/Products";
 import Items from "./Components/ProductTypes/Items";
+import Products from "./Components/ProductTypes/Products";
 import Context from "./Context";
 
-import styles from "./App.module.scss";
+
 
 const App = () => {
   const { linkSuccess, isItemAccess, dispatch } = useContext(Context);
 
   const getInfo = useCallback(async () => {
-    const response = await fetch("/api/info", { method: "POST" });
+    const response = await fetch("http://localhost:8000/api/v1/plaid/info", {
+      method: "POST",
+      headers: new Headers({
+        'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+      }),
+    });
     if (!response.ok) {
       dispatch({ type: "SET_STATE", state: { backend: false } });
       return { paymentInitiation: false };
@@ -32,10 +37,13 @@ const App = () => {
   const generateToken = useCallback(
     async (paymentInitiation) => {
       const path = paymentInitiation
-        ? "/api/create_link_token_for_payment"
-        : "/api/create_link_token";
+        ? "http://localhost:8000/api/create_link_token_for_payment"
+        : "http://localhost:8000/api/v1/plaid/create_link_token";
       const response = await fetch(path, {
         method: "POST",
+        headers: new Headers({
+          'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+        }),
       });
       if (!response.ok) {
         dispatch({ type: "SET_STATE", state: { linkToken: null } });

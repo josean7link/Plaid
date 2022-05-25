@@ -1,24 +1,33 @@
-import React, { useEffect, useContext } from "react";
-import { usePlaidLink } from "react-plaid-link";
 import Button from "plaid-threads/Button";
-
+import React, { useContext, useEffect } from "react";
+import { usePlaidLink } from "react-plaid-link";
 import Context from "../../Context";
+
 
 const Link = () => {
   const { linkToken, dispatch } = useContext(Context);
 
   const onSuccess = React.useCallback(
-    (public_token: string) => {
+    (public_token: string, metadata: any) => {
       // send public_token to server
+      console.log('public token ', public_token);
+      console.log('metadata ', metadata);
+      console.log('Authorization: Bearer', process.env.REACT_APP_API_TOKEN);
       const setToken = async () => {
-        const response = await fetch("/api/set_access_token", {
+        // const url = `http://localhost:8000/api/v1/plaid/set_access_token?account=${metadata.accounts[0].id}&public_token=${public_token}`;
+        const url = `http://localhost:8000/api/v1/plaid/set_access_token`;
+        const response = await fetch(url, {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            //"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
           },
-          body: `public_token=${public_token}`,
+          // body: {
+          //   'public_token': public_token
+          // },
         });
         if (!response.ok) {
+          console.log(response)
           dispatch({
             type: "SET_STATE",
             state: {
@@ -30,6 +39,7 @@ const Link = () => {
           return;
         }
         const data = await response.json();
+        // coloco el codigo para reenviar el responde.
         dispatch({
           type: "SET_STATE",
           state: {
